@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 @RestController
 public class PlaceController {
-    public static final String mongoUri = "mongodb://jpdev832.dyndns.org:27017/placey";
+    public static final String mongoUri = "mongodb://localhost:27017/placey";
     public static final String DB_PLACE = "placey";
     public static final String COLL_PLACE = "places";
     public static final String COLL_FEATURE = "features";
