@@ -7,11 +7,10 @@ public interface DataStore<T> {
     /**
      * Retrieve data from the data store
      *
-     * @param clazz class of retrieved objects
      * @param extras any additional data need for data store
      * @return retrieved objects
      */
-    public T[] retrieve(Class<T> clazz, Object extras);
+    public T[] retrieve(Object... extras);
 
     /**
      * Insert data into the data store
@@ -20,7 +19,7 @@ public interface DataStore<T> {
      * @param extras any additional data need for data store
      * @return insert status
      */
-    public boolean insert(T object, Object extras);
+    public boolean insert(T object, Object... extras);
 
     /**
      * Update data in the data store
@@ -29,5 +28,5 @@ public interface DataStore<T> {
      * @param extras any additional data need for data store
      * @return update status
      */
-    public boolean update(T object, Object extras);
+    public boolean update(T object, Object... extras);
 }
