@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * Created by joelparrish on 2/15/15.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Feature extends Transaction<Feature> implements TransactionObject {
+public class Feature implements TransactionObject {
     private long id;
     private String name;
     private String category;
@@ -24,7 +24,5 @@ public class Feature extends Transaction<Feature> implements TransactionObject {
         return category;
     }
 
-    public float getValue() {
-        return value;
-    }
+    public float getValue() { return value; }
 }
