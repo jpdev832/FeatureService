@@ -30,7 +30,7 @@ public class MongoDBPlaceStore extends MongoDBStore implements DataStore<Place> 
      */
     @Override
     public Place[] retrieve(Object... extras) {
-        if(extras.length < 2)
+        if(extras.length < 5)
             return null;
 
         try {

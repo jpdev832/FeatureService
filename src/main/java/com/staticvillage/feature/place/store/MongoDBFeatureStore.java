@@ -25,13 +25,13 @@ public class MongoDBFeatureStore extends MongoDBStore implements DataStore<Featu
      */
     @Override
     public Feature[] retrieve(Object... extras) {
-        if(extras.length < 2)
+        if(extras.length < 3)
             return null;
 
         try {
             long id = Long.parseLong((String)extras[0]);
 
-            DBObject query = getQuery(id, "", "", "", "", (String)extras[0], (String)extras[1]);
+            DBObject query = getQuery(id, "", "", "", "", (String)extras[1], (String)extras[2]);
             DBCollection collection = getCollection(COLL_FEATURE);
 
             int index = 0 ;
