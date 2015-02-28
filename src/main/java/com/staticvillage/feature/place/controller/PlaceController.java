@@ -60,7 +60,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place", method = RequestMethod.PUT)
     public PlaceResponse setPlace(@RequestBody Place place){
-        Place[] places = placeStore.retrieve(place.getId(), "", "", "", "", "");
+        Place[] places = placeStore.retrieve(String.valueOf(place.getId()), "", "", "", "", "");
 
         if(places != null) {
             System.out.println(String.format("Already exists: %s", place.getName()));
@@ -84,7 +84,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place", method = RequestMethod.POST)
     public PlaceResponse updatePlace(@RequestBody Place place){
-        Place[] places = placeStore.retrieve(place.getId(), "", "", "", "", "");
+        Place[] places = placeStore.retrieve(String.valueOf(place.getId()), "", "", "", "", "");
 
         if(places == null) {
             System.out.println(String.format("Already exists: %s", place.getName()));
@@ -125,7 +125,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place/feature", method = RequestMethod.PUT)
     public FeatureResponse setFeature(@RequestBody Feature feature){
-        Feature[] features = featureStore.retrieve(feature.getId(), "", "");
+        Feature[] features = featureStore.retrieve(String.valueOf(feature.getId()), "", "");
 
         if(features != null) {
             System.out.println(String.format("Already exists: %s", feature.getName()));
