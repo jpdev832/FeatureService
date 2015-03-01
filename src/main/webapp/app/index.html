@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" ng-app="recommendation">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title</title>
+<link rel="stylesheet"
+	href="bower_components/bootstrap/dist/css/bootstrap.css">
+
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-resource/angular-resource.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+<script src="js/app.js"></script>
+<script src="js/controllers.js"></script>
+<script src="js/services.js"></script>
+
+</head>
+<body>
+	<div class="container-fluid">
+
+		<div class="navbar navbar-inverse" ng-controller="HeaderCtrl">
+			<ul class="nav navbar-nav">
+				<li
+					ng-class="{ active: isActive('/places') || isActive('/places/add')}"><a
+					href="/app/#/places">Places</a></li>
+				<li
+					ng-class="{ active: isActive('/features') || isActive('/features/add')}"><a
+					href="/app/#/features">Features</a></li>
+
+			</ul>
+			<button type="button" class="btn btn-primary pull-right btn-lg"
+				ng-click="add()">Create</button>
+		</div>
+
+		<div ng-view></div>
+
+	</div>
+</body>
+</html>

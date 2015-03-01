@@ -2,7 +2,7 @@
   "version": "0.0.0",
   "private": true,
   "name": "feature-service",
-  "description": "A Web client for Recommedations",
+  "description": "A Web client for Features in Recommendation Engine",
   "repository": "https://github.com/jpdev832/FeatureService",
   "devDependencies": {
     "karma": "^0.12.16",
