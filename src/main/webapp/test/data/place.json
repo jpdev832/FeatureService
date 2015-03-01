@@ -1,0 +1,9 @@
+{ 
+		"id": "1234",
+		"name":"Mi Casa", 
+		"location" : "Down by the river", 
+		"neighborhood" :"BillysBurg", 
+		"city":"Brooklyn",   		
+		"state": "New York", 
+		"country":"US"
+}
