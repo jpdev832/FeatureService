@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Feature implements TransactionObject {
-    private long id;
+    private String id;
     private String name;
     private String category;
     private float value;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 

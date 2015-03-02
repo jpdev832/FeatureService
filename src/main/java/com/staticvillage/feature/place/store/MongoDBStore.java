@@ -1,6 +1,7 @@
 package com.staticvillage.feature.place.store;
 
 import com.mongodb.*;
+import org.bson.types.ObjectId;
 
 import java.net.UnknownHostException;
 import java.util.List;
@@ -52,15 +53,15 @@ public class MongoDBStore {
      * @param name place name
      * @return retrieval query
      */
-    protected DBObject getQuery(long id, String country, String state, String city, String neighborhood, String name,
+    protected DBObject getQuery(String id, String country, String state, String city, String neighborhood, String name,
                               String category){
-        if(id < 1 && country.isEmpty() && state.isEmpty() && city.isEmpty() && neighborhood.isEmpty() && name.isEmpty()
+        if(id.isEmpty() && country.isEmpty() && state.isEmpty() && city.isEmpty() && neighborhood.isEmpty() && name.isEmpty()
                 && category.isEmpty())
             return null;
 
         BasicDBObject dbObject = new BasicDBObject();
-        if(id > 0)
-            dbObject.put(KEY_ID, id);
+        if(!id.isEmpty())
+            dbObject.put("_id", new ObjectId(id));
         if(!country.isEmpty())
             dbObject.put(KEY_COUNTRY, country);
         if(!state.isEmpty())

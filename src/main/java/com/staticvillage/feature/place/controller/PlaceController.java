@@ -39,8 +39,8 @@ public class PlaceController {
      * @return response
      */
     @RequestMapping(value = "/place", method = RequestMethod.GET)
-    public PlaceResponse getPlace(@RequestParam(value = "id", defaultValue = "-1")String idStr,
-                                  @RequestParam(value = "country", defaultValue = "usa")String country,
+    public PlaceResponse getPlace(@RequestParam(value = "id", defaultValue = "")String idStr,
+                                  @RequestParam(value = "country", defaultValue = "")String country,
                                   @RequestParam(value = "state", defaultValue = "")String state,
                                   @RequestParam(value = "city", defaultValue = "")String city,
                                   @RequestParam(value = "neighborhood", defaultValue = "")String neighborhood,
@@ -60,7 +60,8 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place", method = RequestMethod.PUT)
     public PlaceResponse setPlace(@RequestBody Place place){
-        Place[] places = placeStore.retrieve(String.valueOf(place.getId()), "", "", "", "", "");
+        Place[] places = placeStore.retrieve("", place.getCountry(), place.getState(), place.getCity(),
+                place.getNeighborhood(), place.getName());
 
         if(places != null) {
             System.out.println(String.format("Already exists: %s", place.getName()));
@@ -84,7 +85,8 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place", method = RequestMethod.POST)
     public PlaceResponse updatePlace(@RequestBody Place place){
-        Place[] places = placeStore.retrieve(String.valueOf(place.getId()), "", "", "", "", "");
+        Place[] places = placeStore.retrieve(place.getId(), place.getCountry(), place.getState(), place.getCity(),
+                place.getNeighborhood(), place.getName());
 
         if(places == null) {
             System.out.println(String.format("Already exists: %s", place.getName()));
@@ -106,7 +108,7 @@ public class PlaceController {
      * @return features
      */
     @RequestMapping(value = "/place/feature", method = RequestMethod.GET)
-    public FeatureResponse getFeature(@RequestParam(value = "id", defaultValue = "-1")String idStr,
+    public FeatureResponse getFeature(@RequestParam(value = "id", defaultValue = "")String idStr,
                                        @RequestParam(value = "name", defaultValue = "")String name,
                                        @RequestParam(value = "category", defaultValue = "")String category){
         Feature[] features = featureStore.retrieve(idStr, name, category);
@@ -125,7 +127,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place/feature", method = RequestMethod.PUT)
     public FeatureResponse setFeature(@RequestBody Feature feature){
-        Feature[] features = featureStore.retrieve(String.valueOf(feature.getId()), "", "");
+        Feature[] features = featureStore.retrieve("", feature.getName(), feature.getCategory());
 
         if(features != null) {
             System.out.println(String.format("Already exists: %s", feature.getName()));

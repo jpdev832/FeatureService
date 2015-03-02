@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Place implements TransactionObject {
-    private long id;
+    private String id;
     private String neighborhood;
     private String city;
     private String state;
@@ -16,7 +16,7 @@ public class Place implements TransactionObject {
     private String location;
     private Feature[] features;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 

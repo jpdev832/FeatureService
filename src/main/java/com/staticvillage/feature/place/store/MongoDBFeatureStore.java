@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.staticvillage.feature.place.model.Feature;
+import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -29,9 +30,7 @@ public class MongoDBFeatureStore extends MongoDBStore implements DataStore<Featu
             return null;
 
         try {
-            long id = Long.parseLong((String)extras[0]);
-
-            DBObject query = getQuery(id, "", "", "", "", (String)extras[1], (String)extras[2]);
+            DBObject query = getQuery((String)extras[0], "", "", "", "", (String)extras[1], (String)extras[2]);
             DBCollection collection = getCollection(COLL_FEATURE);
 
             int index = 0 ;
@@ -47,6 +46,8 @@ public class MongoDBFeatureStore extends MongoDBStore implements DataStore<Featu
             Feature[] objects = new Feature[cursor.count()];
             while(cursor.hasNext()){
                 DBObject obj = cursor.next();
+                obj.put(KEY_ID, ((ObjectId)obj.get("_id")).toString());
+                obj.removeField("_id");
 
                 Feature object = mapper.readValue(obj.toString(), Feature.class);
                 objects[index++] = object;
@@ -81,12 +82,14 @@ public class MongoDBFeatureStore extends MongoDBStore implements DataStore<Featu
             DBCollection collection = getCollection(COLL_FEATURE);
 
             String json = mapper.writeValueAsString(object);
-            System.out.println(String.format("Adding: %s", json));
             DBObject dbObj = (DBObject) JSON.parse(json);
+            dbObj.removeField(KEY_ID);
+
+            System.out.println(String.format("Adding: %s", dbObj.toString()));
 
             WriteResult writeResult = collection.insert(dbObj, WriteConcern.NORMAL);
             System.out.println(String.format("Affected rows: %d", writeResult.getN()));
-            return writeResult.getN() > 0;
+            return true;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println(String.format("Error occurred: %s", e.getMessage()));
@@ -113,7 +116,10 @@ public class MongoDBFeatureStore extends MongoDBStore implements DataStore<Featu
             String json = mapper.writeValueAsString(object);
             DBObject dbObj = (DBObject) JSON.parse(json);
 
-            DBObject query = new BasicDBObject(KEY_ID, object.getId());
+            String id = (String) dbObj.get(KEY_ID);
+            dbObj.removeField(KEY_ID);
+
+            DBObject query = new BasicDBObject("_id", new ObjectId(id));
             WriteResult writeResult = collection.update(query, dbObj);
 
             return writeResult.getN() > 0;

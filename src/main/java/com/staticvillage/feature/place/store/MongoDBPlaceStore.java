@@ -8,6 +8,7 @@ import com.mongodb.*;
 import com.mongodb.util.JSON;
 //import com.staticvillage.feature.place.model.Feature;
 import com.staticvillage.feature.place.model.Place;
+import org.bson.types.ObjectId;
 
 import java.io.IOException;
 //import java.lang.reflect.Array;
@@ -34,9 +35,7 @@ public class MongoDBPlaceStore extends MongoDBStore implements DataStore<Place> 
             return null;
 
         try {
-            long id = Long.parseLong((String)extras[0]);
-
-            DBObject query = getQuery(id, (String)extras[1], (String)extras[2], (String)extras[3],
+            DBObject query = getQuery((String)extras[0], (String)extras[1], (String)extras[2], (String)extras[3],
                     (String)extras[4], (String)extras[5], "");
             DBCollection collection = getCollection(COLL_PLACE);
 
@@ -53,6 +52,8 @@ public class MongoDBPlaceStore extends MongoDBStore implements DataStore<Place> 
             Place[] objects = new Place[cursor.count()];
             while(cursor.hasNext()){
                 DBObject obj = cursor.next();
+                obj.put(KEY_ID, ((ObjectId)obj.get("_id")).toString());
+                obj.removeField("_id");
 
                 Place object = mapper.readValue(obj.toString(), Place.class);
                 objects[index++] = object;
@@ -87,12 +88,14 @@ public class MongoDBPlaceStore extends MongoDBStore implements DataStore<Place> 
             DBCollection collection = getCollection(COLL_PLACE);
 
             String json = mapper.writeValueAsString(object);
-            System.out.println(String.format("Adding: %s", json));
             DBObject dbObj = (DBObject) JSON.parse(json);
+            dbObj.removeField(KEY_ID);
+
+            System.out.println(String.format("Adding: %s", dbObj.toString()));
 
             WriteResult writeResult = collection.insert(dbObj, WriteConcern.NORMAL);
             System.out.println(String.format("Affected rows: %d", writeResult.getN()));
-            return writeResult.getN() > 0;
+            return true;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println(String.format("Error occurred: %s", e.getMessage()));
@@ -119,7 +122,10 @@ public class MongoDBPlaceStore extends MongoDBStore implements DataStore<Place> 
             String json = mapper.writeValueAsString(object);
             DBObject dbObj = (DBObject) JSON.parse(json);
 
-            DBObject query = new BasicDBObject(KEY_ID, object.getId());
+            String id = (String) dbObj.get(KEY_ID);
+            dbObj.removeField(KEY_ID);
+
+            DBObject query = new BasicDBObject("_id", new ObjectId(id));
             WriteResult writeResult = collection.update(query, dbObj);
 
             return writeResult.getN() > 0;

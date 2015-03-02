@@ -4,5 +4,5 @@ package com.staticvillage.feature.place.model;
  * Created by joelparrish on 2/22/15.
  */
 public interface TransactionObject {
-    public long getId();
+    public String getId();
 }
