@@ -70,13 +70,12 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 			if(resource == "places"){
 				
 				Place.get(function(data){
-					$scope.data = data;
-
+					$scope.places = data.places;
 				});
 				
 			}else if (resource == "features"){
 				Feature.get(function(data){
-					$scope.data = data;
+					$scope.features = data.features;
 				});
 			}
 		}

@@ -23,12 +23,48 @@
 
 		</div>
 
-		<div class="row" ng-show="data">
+		<div class="row" ng-show="places">
 			<div class="form-group col-xs-12">
-
-				<div class="well">{{data}}</div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Neighborhood</th>
+							<th>City</th>
+							<th>State</th>
+							<th>Country</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="item in places | orderBy:'name'">
+							<td>{{item.name}}</td>
+							<td>{{item.neighborhood}}</td>
+							<td>{{item.city}}</td>
+							<td>{{item.state}}</td>
+							<td>{{item.country}}</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
+		</div>
 
+		<div class="row" ng-show="features">
+			<div class="form-group col-xs-12">
+				<table class="table table-striped">
+					<thead>
+					<tr>
+						<th>Name</th>
+						<th>Category</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr ng-repeat="item in features | orderBy:'name'">
+						<td>{{item.name}}</td>
+						<td>{{item.category}}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
 
 	</form>
