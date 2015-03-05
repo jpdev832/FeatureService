@@ -55,24 +55,26 @@ public class MongoDBStore {
      */
     protected DBObject getQuery(String id, String country, String state, String city, String neighborhood, String name,
                               String category){
-        if(id.isEmpty() && country.isEmpty() && state.isEmpty() && city.isEmpty() && neighborhood.isEmpty() && name.isEmpty()
-                && category.isEmpty())
+
+        if((id == null || id.isEmpty()) && (country == null || country.isEmpty()) && (state == null || state.isEmpty() )
+                && (city == null || city.isEmpty()) && (neighborhood == null || neighborhood.isEmpty()) &&
+                (name == null || name.isEmpty()) && (category == null || category.isEmpty()))
             return null;
 
         BasicDBObject dbObject = new BasicDBObject();
-        if(!id.isEmpty())
+        if(id != null && !id.isEmpty())
             dbObject.put("_id", new ObjectId(id));
-        if(!country.isEmpty())
+        if(country !=null && !country.isEmpty())
             dbObject.put(KEY_COUNTRY, country);
-        if(!state.isEmpty())
+        if(state != null && !state.isEmpty())
             dbObject.put(KEY_STATE, state);
-        if(!city.isEmpty())
+        if(city != null && !city.isEmpty())
             dbObject.put(KEY_CITY, city);
-        if(!neighborhood.isEmpty())
+        if(neighborhood != null && !neighborhood.isEmpty())
             dbObject.put(KEY_NEIGHBORHOOD, neighborhood);
-        if(!name.isEmpty())
+        if(name != null && !name.isEmpty())
             dbObject.put(KEY_NAME, name);
-        if(!category.isEmpty())
+        if(category != null && !category.isEmpty())
             dbObject.put(KEY_CATEGORY, category);
 
         return dbObject;

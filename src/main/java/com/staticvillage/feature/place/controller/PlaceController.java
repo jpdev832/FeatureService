@@ -1,10 +1,7 @@
 package com.staticvillage.feature.place.controller;
 
 import com.mongodb.*;
-import com.staticvillage.feature.place.model.Feature;
-import com.staticvillage.feature.place.model.FeatureResponse;
-import com.staticvillage.feature.place.model.Place;
-import com.staticvillage.feature.place.model.PlaceResponse;
+import com.staticvillage.feature.place.model.*;
 import com.staticvillage.feature.place.store.DataStore;
 import com.staticvillage.feature.place.store.MongoDBFeatureStore;
 import com.staticvillage.feature.place.store.MongoDBPlaceStore;
@@ -39,7 +36,7 @@ public class PlaceController {
      * @return response
      */
     @RequestMapping(value = "/place", method = { RequestMethod.PUT, RequestMethod.POST })
-    public PlaceResponse setPlace(@RequestBody Place place){
+    public Response setPlace(@RequestBody Place place){
         log.info(String.format("Checking if Place already exists [%s,%s,%s,%s,%s]...", place.getName(),
                 place.getCountry(), place.getState(), place.getCity(), place.getNeighborhood()));
 
@@ -47,24 +44,29 @@ public class PlaceController {
                 place.getNeighborhood(), place.getName());
 
         if(places != null) {
+            if(place.getId() == null) {
+                log.info("Place ID is missing");
+                return new Response(null, "Failed to update. {Invalid Place ID}", false, "places", "place" );
+            }
+
             log.info(String.format("Updating {%s}", place.getName()));
 
             if(placeStore.update(place)) {
                 log.info(String.format("Updated!: %s", place.getId()));
-                return new PlaceResponse(new Place[]{place}, "success");
+                return new Response(new Place[]{place}, "success", true, "places", "place");
             }else {
                 log.info(String.format("Failed to update: %s", place.getName()));
-                return new PlaceResponse(null, "failed");
+                return new Response(null, "failed", false, "places", "place");
             }
         } else {
             log.info(String.format("Adding {%s}", place.getName()));
 
             if (placeStore.insert(place)) {
                 log.info(String.format("Added!: %s", place.getId()));
-                return new PlaceResponse(new Place[]{place}, "success");
+                return new Response(new Place[]{place}, "success", true, "places", "place");
             } else {
                 log.info(String.format("Failed to Add: %s", place.getName()));
-                return new PlaceResponse(null, "failed");
+                return new Response(null, "failed", false, "places", "place");
             }
         }
     }
@@ -80,7 +82,7 @@ public class PlaceController {
      * @return response
      */
     @RequestMapping(value = "/place", method = RequestMethod.GET)
-    public PlaceResponse getPlace(@RequestParam(value = "country", defaultValue = "")String country,
+    public Response getPlace(@RequestParam(value = "country", defaultValue = "")String country,
                                   @RequestParam(value = "state", defaultValue = "")String state,
                                   @RequestParam(value = "city", defaultValue = "")String city,
                                   @RequestParam(value = "neighborhood", defaultValue = "")String neighborhood,
@@ -91,10 +93,10 @@ public class PlaceController {
 
         if(places == null) {
             log.warn("No items were found!");
-            return new PlaceResponse(null, "Error occurred retrieving places");
+            return new Response(null, "Error occurred retrieving places", false, "places", "place");
         } else {
             log.info(String.format("Found %d places", places.length));
-            return new PlaceResponse(places, "success");
+            return new Response(places, "success", true, "places", "place");
         }
     }
 
@@ -104,16 +106,16 @@ public class PlaceController {
      * @return response
      */
     @RequestMapping(value = "/place/{id}", method = RequestMethod.GET)
-    public PlaceResponse getPlace(@PathVariable("id") String id){
+    public Response getPlace(@PathVariable("id") String id){
         log.info(String.format("Checking if Place already exists [%s]...", id));
         Place[] places = placeStore.retrieve(id, "", "", "", "", "");
 
         if(places == null) {
             log.warn("No items were found!");
-            return new PlaceResponse(null, "Error occurred retrieving places");
+            return new Response(null, "Error occurred retrieving places", false, "places", "place");
         } else {
             log.info(String.format("Found %d places", places.length));
-            return new PlaceResponse(places, "success");
+            return new Response(places, "success", true, "places", "place");
         }
     }
 
@@ -124,7 +126,7 @@ public class PlaceController {
      * @return response
      */
     @RequestMapping(value = "/place/{id}", method = RequestMethod.POST)
-    public PlaceResponse setPlace(@PathVariable("id") String id,
+    public Response setPlace(@PathVariable("id") String id,
                                   @RequestBody Place place){
 
         log.info(String.format("Checking if Place exists [%s,%s,%s,%s,%s,%s]...", id, place.getName(),
@@ -138,15 +140,15 @@ public class PlaceController {
 
             if(placeStore.update(place)) {
                 log.info(String.format("Updated!: %s", place.getId()));
-                return new PlaceResponse(new Place[]{place}, "success");
+                return new Response(new Place[]{place}, "success", true, "places", "place");
             }else {
                 log.info(String.format("Failed to update: %s", place.getName()));
-                return new PlaceResponse(null, "failed");
+                return new Response(null, "failed", false, "places", "place");
             }
         }
 
         log.info(String.format("Failed to Update: %s", place.getName()));
-        return new PlaceResponse(null, "failed");
+        return new Response(null, "failed", false, "places", "place");
     }
 
     /**
@@ -156,21 +158,21 @@ public class PlaceController {
      * @return status
      */
     @RequestMapping(value = "/place/feature", method = { RequestMethod.PUT, RequestMethod.POST })
-    public FeatureResponse setFeature(@RequestBody Feature feature){
+    public Response setFeature(@RequestBody Feature feature){
         log.info(String.format("Checking if Feature exists [%s,%s]...", feature.getName(), feature.getCategory()));
         Feature[] features = featureStore.retrieve(feature.getId(), feature.getName(), feature.getCategory());
 
         if(features != null) {
             log.info(String.format("Feature already exists: {%s}", feature.getName()));
-            return new FeatureResponse(null, "already exists");
+            return new Response(null, "already exists", false, "places", "feature");
         }
 
         if(featureStore.insert(feature)) {
             log.info(String.format("Feature was added: {%s}", feature.getId()));
-            return new FeatureResponse(new Feature[]{feature}, "success");
+            return new Response(new Feature[]{feature}, "success", true, "places", "feature");
         }else {
             log.info(String.format("Failed to add feature: {%s}", feature.getName()));
-            return new FeatureResponse(null, "failed");
+            return new Response(null, "failed", false, "places", "feature");
         }
     }
 
@@ -182,17 +184,17 @@ public class PlaceController {
      * @return features
      */
     @RequestMapping(value = "/place/feature", method = RequestMethod.GET)
-    public FeatureResponse getFeature(@RequestParam(value = "name", defaultValue = "")String name,
+    public Response getFeature(@RequestParam(value = "name", defaultValue = "")String name,
                                       @RequestParam(value = "category", defaultValue = "")String category){
         log.info(String.format("Checking if Feature exists [%s,%s]...", name, category));
         Feature[] features = featureStore.retrieve("", name, category);
 
         if(features == null) {
             log.warn("no features were found!");
-            return new FeatureResponse(null, "Error occurred retrieving features");
+            return new Response(null, "Error occurred retrieving features", false, "places", "feature");
         } else {
             log.info(String.format("Found %d features", features.length));
-            return new FeatureResponse(features, "success");
+            return new Response(features, "success", true, "places", "feature");
         }
     }
 
@@ -202,16 +204,16 @@ public class PlaceController {
      * @return feature
      */
     @RequestMapping(value = "/place/feature/{id}", method = RequestMethod.GET)
-    public FeatureResponse getFeature(@PathVariable("id") String id){
+    public Response getFeature(@PathVariable("id") String id){
         log.info(String.format("Retrieving Feature [%s]...", id));
         Feature[] features = featureStore.retrieve(id, "", "");
 
         if(features == null) {
             log.warn("no features were found!");
-            return new FeatureResponse(null, "Error occurred retrieving feature");
+            return new Response(null, "Error occurred retrieving feature", false, "places", "feature");
         } else {
             log.info(String.format("Found %d features", features.length));
-            return new FeatureResponse(features, "success");
+            return new Response(features, "success", true, "places", "feature");
         }
     }
 }
