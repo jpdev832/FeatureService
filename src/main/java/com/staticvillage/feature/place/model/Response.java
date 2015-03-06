@@ -4,14 +4,14 @@ package com.staticvillage.feature.place.model;
  * Created by joelparrish on 3/3/15.
  */
 public class Response {
-    private TransactionObject[] data;
+    private Object[] data;
     private int count;
     private String message;
     private boolean ok;
     private String index;
     private String type;
 
-    public Response(TransactionObject[] data, String message, boolean ok, String index, String type){
+    public Response(Object[] data, String message, boolean ok, String index, String type){
         this.data = data;
         this.message = message;
         this.ok = ok;
@@ -24,7 +24,7 @@ public class Response {
             this.count = 0;
     }
 
-    public TransactionObject[] getData() { return data; }
+    public Object[] getData() { return data; }
 
     public int getCount() {
         return count;

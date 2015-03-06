@@ -29,4 +29,12 @@ public interface DataStore<T> {
      * @return update status
      */
     public boolean update(T object, Object... extras);
+
+    /**
+     * Retrieve autocomplete results
+     *
+     * @param objects additional data need for data store
+     * @return autocomplete results
+     */
+    public Object[] autoComplete(Object... objects);
 }

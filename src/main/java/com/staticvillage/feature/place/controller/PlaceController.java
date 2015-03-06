@@ -152,6 +152,61 @@ public class PlaceController {
     }
 
     /**
+     * Retrieve autocomplete place name
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/place/name", method = RequestMethod.GET)
+    public Response autoCompletePlaceName(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(placeStore, "place", "name", query);
+    }
+
+    /**
+     * Retrieve autocomplete place neighborhood
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/place/neighborhood", method = RequestMethod.GET)
+    public Response autoCompletePlaceNeighborhood(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(placeStore, "place", "neighborhood", query);
+    }
+
+    /**
+     * Retrieve autocomplete place city
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/place/city", method = RequestMethod.GET)
+    public Response autoCompletePlaceCity(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(placeStore, "place", "city", query);
+    }
+
+    /**
+     * Retrieve autocomplete place state
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/place/state", method = RequestMethod.GET)
+    public Response autoCompletePlaceState(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(placeStore, "place", "state", query);
+    }
+
+    /**
+     * Retrieve autocomplete place name
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/place/country", method = RequestMethod.GET)
+    public Response autoCompletePlaceCountry(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(placeStore, "place", "country", query);
+    }
+
+    /**
      * Add features to system
      *
      * @param feature feature to add
@@ -185,7 +240,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place/feature", method = RequestMethod.GET)
     public Response getFeature(@RequestParam(value = "name", defaultValue = "")String name,
-                                      @RequestParam(value = "category", defaultValue = "")String category){
+                               @RequestParam(value = "category", defaultValue = "")String category){
         log.info(String.format("Checking if Feature exists [%s,%s]...", name, category));
         Feature[] features = featureStore.retrieve("", name, category);
 
@@ -201,6 +256,7 @@ public class PlaceController {
     /**
      * Retrieve feature
      *
+     * @param id feature name
      * @return feature
      */
     @RequestMapping(value = "/place/feature/{id}", method = RequestMethod.GET)
@@ -214,6 +270,52 @@ public class PlaceController {
         } else {
             log.info(String.format("Found %d features", features.length));
             return new Response(features, "success", true, "places", "feature");
+        }
+    }
+
+    /**
+     * Retrieve autocomplete feature name
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/feature/name", method = RequestMethod.GET)
+    public Response autoCompleteFeatureName(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(featureStore, "feature", "name", query);
+    }
+
+    /**
+     * Retrieve autocomplete feature category
+     *
+     * @param query query string
+     * @return autocomplete features
+     */
+    @RequestMapping(value = "/autocomplete/feature/category", method = RequestMethod.GET)
+    public Response autoCompleteFeatureCategory(@RequestParam(value = "q", defaultValue = "") String query){
+        return autoComplete(featureStore, "feature", "category", query);
+    }
+
+    /**
+     * AutoComplete function
+     *
+     * @param dataStore datastore used for retrieving
+     * @param type response type
+     * @param query query
+     * @return autocomplete
+     */
+    private Response autoComplete(DataStore dataStore, String type, String key, String query){
+        log.info(String.format("looking for terms like [%s]...", query));
+        if(query.length() < 3)
+            return new Response(null, "Too short", false, "autocomplete", type);
+
+        Object[] res = dataStore.autoComplete(key, query);
+
+        if(res == null) {
+            log.warn("no autocomplete results");
+            return new Response(null, "No autocomplete results found", false, "autocomplete", type);
+        } else {
+            log.info(String.format("Found %d features", res.length));
+            return new Response(res, "success", true, "autocomplete", type);
         }
     }
 }

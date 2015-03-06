@@ -11,6 +11,8 @@ import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by joelparrish on 2/25/15.
@@ -130,5 +132,27 @@ public class MongoDBFeatureStore extends MongoDBStore implements DataStore<Featu
         }
 
         return false;
+    }
+
+    @Override
+    public Object[] autoComplete(Object... objects) {
+        if(objects.length < 2)
+            return new Object[0];
+
+        String key = (String)objects[0];
+        String query = (String)objects[1];
+
+        try {
+            DBCollection collection = getCollection(COLL_FEATURE);
+            Pattern q = Pattern.compile(String.format("^%s", query), Pattern.CASE_INSENSITIVE);
+            DBObject obj = new BasicDBObject(key, q);
+            List res = collection.distinct(key, obj);
+
+            return res.toArray(new Object[]{});
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        return new Object[0];
     }
 }

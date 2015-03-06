@@ -13,6 +13,8 @@ import org.bson.types.ObjectId;
 import java.io.IOException;
 //import java.lang.reflect.Array;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.regex.Pattern;
 //import java.util.ArrayList;
 //import java.util.Arrays;
 
@@ -138,40 +140,25 @@ public class MongoDBPlaceStore extends MongoDBStore implements DataStore<Place> 
         return false;
     }
 
-    /*private void checkAndStoreNewFeatures(Feature[] features){
+    @Override
+    public Object[] autoComplete(Object... objects) {
+        if(objects.length < 2)
+            return new Object[0];
+
+        String key = (String)objects[0];
+        String query = (String)objects[1];
+
         try {
-            ArrayList<Long> featureIds = new ArrayList<Long>(features.length);
-            for(Feature f : features)
-                featureIds.add(f.getId());
+            DBCollection collection = getCollection(COLL_PLACE);
+            Pattern q = Pattern.compile(String.format("^%s", query), Pattern.CASE_INSENSITIVE);
+            DBObject obj = new BasicDBObject(key, q);
+            List res = collection.distinct(key, obj);
 
-            DBObject query = getQueryWithin(KEY_ID, featureIds);
-            DBCollection collection = getCollection(COLL_FEATURE);
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            DBCursor cursor = null;
-            if(query == null)
-                cursor = collection.find();
-            else
-                cursor = collection.find(query);
-
-            if(cursor.count() != features.length) {
-                MongoDBFeatureStore featureStore = new MongoDBFeatureStore();
-                while (cursor.hasNext()) {
-                    DBObject obj = cursor.next();
-                    Feature object = mapper.readValue(obj.toString(), Feature.class);
-
-                    featureStore.insert(object);
-                }
-            }
+            return res.toArray(new Object[]{});
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }*/
+
+        return new Object[0];
+    }
 }
