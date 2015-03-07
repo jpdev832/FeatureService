@@ -1,16 +1,13 @@
 package com.staticvillage.feature.place.controller;
 
-import com.mongodb.*;
 import com.staticvillage.feature.place.model.*;
 import com.staticvillage.feature.place.store.DataStore;
-import com.staticvillage.feature.place.store.MongoDBFeatureStore;
-import com.staticvillage.feature.place.store.MongoDBPlaceStore;
+import com.staticvillage.feature.place.store.MongoDBStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Created by joelparrish on 2/15/15.
@@ -19,15 +16,28 @@ import java.util.Arrays;
 public class PlaceController {
     private static Logger log = LoggerFactory.getLogger(PlaceController.class);
 
-    //Todo - initialize from configuration at later point
-    private DataStore<Place> placeStore;
-    private DataStore<Feature> featureStore;
+    public static final String EXTRA_KEY_TARGET = "target";
+    public static final String EXTRA_KEY_ID = "id";
+    public static final String EXTRA_KEY_NAME = "name";
+    public static final String EXTRA_KEY_NEIGHBORHOOD = "neighborhood";
+    public static final String EXTRA_KEY_CITY = "city";
+    public static final String EXTRA_KEY_STATE = "state";
+    public static final String EXTRA_KEY_COUNTRY = "country";
+    public static final String EXTRA_KEY_TYPE = "type";
+    public static final String EXTRA_KEY_CATEGORY = "category";
+
+    public static final String AUTO_TYPE_PLACE = "place";
+    public static final String AUTO_TYPE_FEATURE = "feature";
+    public static final String EXTRA_AUTO_TYPE = "auto_type";
+    public static final String EXTRA_AUTO_KEY = "auto_key";
+    public static final String EXTRA_AUTO_QUERY = "auto_query";
+
+    private DataStore<TransactionObject> store;
 
     public PlaceController(){
-        log.info("initializing stores...");
-        placeStore = new MongoDBPlaceStore();
-        featureStore = new MongoDBFeatureStore();
-        log.info("stores initialized");
+        log.info("initializing store...");
+        store = new MongoDBStore();
+        log.info("store initialized");
     }
 
     /**
@@ -40,8 +50,17 @@ public class PlaceController {
         log.info(String.format("Checking if Place already exists [%s,%s,%s,%s,%s]...", place.getName(),
                 place.getCountry(), place.getState(), place.getCity(), place.getNeighborhood()));
 
-        Place[] places = placeStore.retrieve(place.getId(), place.getCountry(), place.getState(), place.getCity(),
-                place.getNeighborhood(), place.getName());
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Place.class);
+        map.put(EXTRA_KEY_ID, place.getId());
+        map.put(EXTRA_KEY_NAME, place.getName());
+        map.put(EXTRA_KEY_COUNTRY, place.getId());
+        map.put(EXTRA_KEY_STATE, place.getId());
+        map.put(EXTRA_KEY_CITY, place.getId());
+        map.put(EXTRA_KEY_NEIGHBORHOOD, place.getId());
+        map.put(EXTRA_KEY_TYPE, place.getType());
+
+        TransactionObject[] places = store.retrieve(map);
 
         if(places != null) {
             if(place.getId() == null) {
@@ -51,7 +70,7 @@ public class PlaceController {
 
             log.info(String.format("Updating {%s}", place.getName()));
 
-            if(placeStore.update(place)) {
+            if(store.update(place, map)) {
                 log.info(String.format("Updated!: %s", place.getId()));
                 return new Response(new Place[]{place}, "success", true, "places", "place");
             }else {
@@ -61,7 +80,7 @@ public class PlaceController {
         } else {
             log.info(String.format("Adding {%s}", place.getName()));
 
-            if (placeStore.insert(place)) {
+            if (store.insert(place, map)) {
                 log.info(String.format("Added!: %s", place.getId()));
                 return new Response(new Place[]{place}, "success", true, "places", "place");
             } else {
@@ -86,10 +105,20 @@ public class PlaceController {
                                   @RequestParam(value = "state", defaultValue = "")String state,
                                   @RequestParam(value = "city", defaultValue = "")String city,
                                   @RequestParam(value = "neighborhood", defaultValue = "")String neighborhood,
+                                  @RequestParam(value = "type", defaultValue = "")String type,
                                   @RequestParam(value = "name", defaultValue = "")String name){
         log.info(String.format("Checking if Place already exists [%s,%s,%s,%s,%s]...", name, country, state, city,
                 neighborhood));
-        Place[] places = placeStore.retrieve("", country, state, city, neighborhood, name);
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Place.class);
+        map.put(EXTRA_KEY_NAME, name);
+        map.put(EXTRA_KEY_NEIGHBORHOOD, neighborhood);
+        map.put(EXTRA_KEY_CITY, city);
+        map.put(EXTRA_KEY_STATE, state);
+        map.put(EXTRA_KEY_COUNTRY, country);
+        map.put(EXTRA_KEY_TYPE, type);
+
+        TransactionObject[] places = store.retrieve(map);
 
         if(places == null) {
             log.warn("No items were found!");
@@ -108,7 +137,12 @@ public class PlaceController {
     @RequestMapping(value = "/place/{id}", method = RequestMethod.GET)
     public Response getPlace(@PathVariable("id") String id){
         log.info(String.format("Checking if Place already exists [%s]...", id));
-        Place[] places = placeStore.retrieve(id, "", "", "", "", "");
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Place.class);
+        map.put(EXTRA_KEY_ID, id);
+
+        TransactionObject[] places = store.retrieve(map);
 
         if(places == null) {
             log.warn("No items were found!");
@@ -132,13 +166,22 @@ public class PlaceController {
         log.info(String.format("Checking if Place exists [%s,%s,%s,%s,%s,%s]...", id, place.getName(),
                 place.getCountry(), place.getState(), place.getCity(), place.getNeighborhood()));
 
-        Place[] places = placeStore.retrieve(place.getId(), place.getCountry(), place.getState(), place.getCity(),
-                place.getNeighborhood(), place.getName());
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Place.class);
+        map.put(EXTRA_KEY_ID, id);
+        map.put(EXTRA_KEY_NAME, place.getName());
+        map.put(EXTRA_KEY_COUNTRY, place.getId());
+        map.put(EXTRA_KEY_STATE, place.getId());
+        map.put(EXTRA_KEY_CITY, place.getId());
+        map.put(EXTRA_KEY_NEIGHBORHOOD, place.getId());
+        map.put(EXTRA_KEY_TYPE, place.getType());
+
+        TransactionObject[] places = store.retrieve(map);
 
         if(places != null) {
             log.info(String.format("Updating {%s}", place.getName()));
 
-            if(placeStore.update(place)) {
+            if(store.update(place, map)) {
                 log.info(String.format("Updated!: %s", place.getId()));
                 return new Response(new Place[]{place}, "success", true, "places", "place");
             }else {
@@ -159,7 +202,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/name", method = RequestMethod.GET)
     public Response autoCompletePlaceName(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(placeStore, "place", "name", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "name", query);
     }
 
     /**
@@ -170,7 +213,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/neighborhood", method = RequestMethod.GET)
     public Response autoCompletePlaceNeighborhood(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(placeStore, "place", "neighborhood", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "neighborhood", query);
     }
 
     /**
@@ -181,7 +224,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/city", method = RequestMethod.GET)
     public Response autoCompletePlaceCity(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(placeStore, "place", "city", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "city", query);
     }
 
     /**
@@ -192,7 +235,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/state", method = RequestMethod.GET)
     public Response autoCompletePlaceState(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(placeStore, "place", "state", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "state", query);
     }
 
     /**
@@ -203,7 +246,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/country", method = RequestMethod.GET)
     public Response autoCompletePlaceCountry(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(placeStore, "place", "country", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "country", query);
     }
 
     /**
@@ -215,14 +258,20 @@ public class PlaceController {
     @RequestMapping(value = "/place/feature", method = { RequestMethod.PUT, RequestMethod.POST })
     public Response setFeature(@RequestBody Feature feature){
         log.info(String.format("Checking if Feature exists [%s,%s]...", feature.getName(), feature.getCategory()));
-        Feature[] features = featureStore.retrieve(feature.getId(), feature.getName(), feature.getCategory());
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Feature.class);
+        map.put(EXTRA_KEY_NAME, feature.getName());
+        map.put(EXTRA_KEY_CATEGORY, feature.getCategory());
+
+        TransactionObject[] features = store.retrieve(map);
 
         if(features != null) {
             log.info(String.format("Feature already exists: {%s}", feature.getName()));
             return new Response(null, "already exists", false, "places", "feature");
         }
 
-        if(featureStore.insert(feature)) {
+        if(store.insert(feature, map)) {
             log.info(String.format("Feature was added: {%s}", feature.getId()));
             return new Response(new Feature[]{feature}, "success", true, "places", "feature");
         }else {
@@ -242,7 +291,13 @@ public class PlaceController {
     public Response getFeature(@RequestParam(value = "name", defaultValue = "")String name,
                                @RequestParam(value = "category", defaultValue = "")String category){
         log.info(String.format("Checking if Feature exists [%s,%s]...", name, category));
-        Feature[] features = featureStore.retrieve("", name, category);
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Feature.class);
+        map.put(EXTRA_KEY_NAME, name);
+        map.put(EXTRA_KEY_CATEGORY, category);
+
+        TransactionObject[] features = store.retrieve(map);
 
         if(features == null) {
             log.warn("no features were found!");
@@ -262,7 +317,12 @@ public class PlaceController {
     @RequestMapping(value = "/place/feature/{id}", method = RequestMethod.GET)
     public Response getFeature(@PathVariable("id") String id){
         log.info(String.format("Retrieving Feature [%s]...", id));
-        Feature[] features = featureStore.retrieve(id, "", "");
+
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_KEY_TARGET, Feature.class);
+        map.put(EXTRA_KEY_ID, id);
+
+        TransactionObject[] features = store.retrieve(map);
 
         if(features == null) {
             log.warn("no features were found!");
@@ -281,7 +341,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/feature/name", method = RequestMethod.GET)
     public Response autoCompleteFeatureName(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(featureStore, "feature", "name", query);
+        return autoComplete(store, AUTO_TYPE_FEATURE, "name", query);
     }
 
     /**
@@ -292,7 +352,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/feature/category", method = RequestMethod.GET)
     public Response autoCompleteFeatureCategory(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(featureStore, "feature", "category", query);
+        return autoComplete(store, AUTO_TYPE_FEATURE, "category", query);
     }
 
     /**
@@ -308,7 +368,12 @@ public class PlaceController {
         if(query.length() < 3)
             return new Response(null, "Too short", false, "autocomplete", type);
 
-        Object[] res = dataStore.autoComplete(key, query);
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put(EXTRA_AUTO_TYPE, type);
+        map.put(EXTRA_AUTO_KEY, key);
+        map.put(EXTRA_AUTO_QUERY, query);
+
+        Object[] res = dataStore.autoComplete(map);
 
         if(res == null) {
             log.warn("no autocomplete results");

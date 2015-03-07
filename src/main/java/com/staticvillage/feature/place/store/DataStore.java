@@ -1,5 +1,7 @@
 package com.staticvillage.feature.place.store;
 
+import java.util.HashMap;
+
 /**
  * Created by joelparrish on 2/24/15.
  */
@@ -10,7 +12,7 @@ public interface DataStore<T> {
      * @param extras any additional data need for data store
      * @return retrieved objects
      */
-    public T[] retrieve(Object... extras);
+    public T[] retrieve(HashMap<String, Object> extras);
 
     /**
      * Insert data into the data store
@@ -19,7 +21,16 @@ public interface DataStore<T> {
      * @param extras any additional data need for data store
      * @return insert status
      */
-    public boolean insert(T object, Object... extras);
+    public boolean insert(T object, HashMap<String, Object> extras);
+
+    /**
+     * Insert N data elements into the data store
+     *
+     * @param objects objects to store
+     * @param extras any additional data need for data store
+     * @return insert status
+     */
+    public boolean insertAll(T[] objects, HashMap<String, Object> extras);
 
     /**
      * Update data in the data store
@@ -28,13 +39,13 @@ public interface DataStore<T> {
      * @param extras any additional data need for data store
      * @return update status
      */
-    public boolean update(T object, Object... extras);
+    public boolean update(T object, HashMap<String, Object> extras);
 
     /**
      * Retrieve autocomplete results
      *
-     * @param objects additional data need for data store
+     * @param extras additional data need for data store
      * @return autocomplete results
      */
-    public Object[] autoComplete(Object... objects);
+    public Object[] autoComplete(HashMap<String, Object> extras);
 }
