@@ -15,12 +15,20 @@ recommendation.config(['$routeProvider',
 			controller: 'SearchCtrl'
 		}).
 		when('/places/add', {
-			templateUrl: 'partials/places/add.html',
+			templateUrl: 'partials/add.html',
 			controller: 'AddCtrl'
 		}).
 		when('/features/add', {
-			templateUrl: 'partials/features/add.html',
+			templateUrl: 'partials/add.html',
 			controller: 'AddCtrl'
+		}).
+		when('/places/update/:id', {
+			templateUrl: 'partials/update.html',
+			controller: 'UpdateCtrl'
+		}).
+		when('/features/update/:id', {
+			templateUrl: 'partials/update.html',
+			controller: 'UpdateCtrl'
 		}).
 		otherwise({
 	        redirectTo: '/places'

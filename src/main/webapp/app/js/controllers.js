@@ -2,54 +2,85 @@
 
 /* Controllers */
 
+//TODO move each controller to its own file
 var controllers = angular.module('controllers', []);
+
+controllers.controller('UpdateCtrl', [ '$scope','$location', '$routeParams', 'Place', 'Feature', function($scope, $location, $routeParams, Place, Feature) {
+	
+	if($location.path() == '/places/update/'+$routeParams.id){
+
+		$scope.resource = "place";
+		Place.get({id: $routeParams.id}, function(resource){
+			$scope.data = resource.data[0];
+		});
+		
+	}else if ($location.path() == '/features/update/'+$routeParams.id){
+		$scope.resource = "Feature";
+		Feature.get({id: $routeParams.id}, function(resource){
+			$scope.data = resource.data[0];
+		});
+	}
+	
+	$scope.save = function() {
+		if($scope.resource == "Place"){
+			var place = new Place($scope.data);
+			place.$save({},
+				function(success){
+				   $scope.updateSuccess = true;
+				},
+				function(error){
+					 $scope.updateError = true;
+				});
+		}else if ($scope.resource == "Feature"){
+			var feature = new Feature($scope.data);
+			feature.$save({},
+					function(success){
+				   $scope.updateSuccess = true;
+				},
+				function(error){
+					 $scope.updateError = true;
+				});
+		}
+	};
+}
+
+]);
 
 controllers.controller('AddCtrl', [ '$scope','$location', 'Place', 'Feature', function($scope, $location, Place, Feature) {
 
-	var resource;
-	
-	
+	if($location.path() == "/places/add"){
+		$scope.resource = "Place";
+	}else if ($location.path() == "/features/add"){
+		$scope.resource = "Feature";
+	}
 	
 	$scope.save = function() {
-		if($location.path() == "/places/add"){
-			
-			var place = toPlace($scope.data)
-			place.$save();
-			
-		}else if ($location.path() == "/features/add"){
-			
-			var feature = toFeature($scope.data)
-			Feature.$save();
+		if($scope.resource == "Place"){
+			var place = new Place($scope.data)
+			place.$save({},
+				function(success){
+				   $scope.addSuccess = true;
+				},
+				function(error){
+					 $scope.addError = true;
+				});
+		}else if ($scope.resource == "Feature"){
+			var feature = new Feature($scope.data)
+			feature.$save({},
+				function(success){
+				   $scope.addSuccess = true;
+				},
+				function(error){
+					 $scope.addError = true;
+				});
 		}
 	};
-	
-	function toPlace(data){
-		var place = new Place();
-		place.name = data.name;
-		place.location = data.location;
-		place.neighborhood = data.neighborhood;
-		place.city = data.city;
-		place.state = data.state;
-		place.country = data.country;
-		return place;
-	}
-	
-	function toFeature(data){
-		var feature = new Feature();
-		feature.name = data.name;
-		feature.category = data.category;
-		feature.value = data.value;
-		
-		return feature;
-	}
 
 }
 
 ]);
 
-controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature', function($scope, $location, Place, Feature) {
-	// TODO add service to handle REST calls
-	
+controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature', function($scope, $location, Place, Feature) {	
 
 	var resource;
 	
@@ -61,34 +92,47 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 		resource = "features";
 		loadFeatureFields();
 	}
-	
+	getResources({})
 
 	$scope.search = function() {
-		
 
-		if ($scope.selectedField && $scope.searchText) {
-			if(resource == "places"){
-				
-				Place.get(function(data){
-					$scope.places = data.places;
-				});
-				
-			}else if (resource == "features"){
-				Feature.get(function(data){
-					$scope.features = data.features;
-				});
-			}
+		if ($scope.searchField) {
+			
+			var filter = {};
+			filter[$scope.searchField] = $scope.searchText;
+			getResources(filter)
+			
 		}
 	};
 	
+	function getResources(filter){
+		
+		if(resource == "places"){
+			Place.get(filter, function(response){
+				$scope.places = response.data;
+			});
+			
+		}else if (resource == "features"){
+			Feature.get(filter, function(response){
+				$scope.features = response.data;
+			});
+		}
+	}
 	
+	$scope.update = function(id){
+		$scope.idSelectedItem = id;
+		$location.path($location.path()+"/update/"+id)
+		
+	}
+	
+	//TODO move static fields to files
 	function loadPlaceFields(){
-		$scope.fields = [{val:'Name'}, {val:'Location'}, {val:'Neighborhood'}, {val:'City'}, {val:'State'}, {val:'Country'}]
+		$scope.fields = [{key:"name", val:'Name'}, {key:"location", val:'Location'}, {key:"neighborhood", val:'Neighborhood'}, {key:"type", val:'Type'}, {key:"city", val:'City'}, {key:"state", val:'State'}, {key:"country", val:'Country'}]
 	}
 	
 	function loadFeatureFields(){
 		
-		$scope.fields = [{val:'Name'}, {val:'Category'},{val:'Value'}]
+		$scope.fields = [{key:"name", val:'Name'}, {key:"category", val:'Category'},{key:"value", val:'Value'}]
 	}
 	
 
@@ -96,15 +140,14 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 }]);
 
 controllers.controller('HeaderCtrl', [ '$scope', '$location', function($scope, $location) {
-
+	
     $scope.isActive = function (viewLocation) { 
     	$scope.location = viewLocation;
         return viewLocation === $location.path();
     };
     
 	$scope.add = function(){
-		$location.path($location.path()+"/add")
-		
+		$location.path($location.path()+"/add")		
 	}
     
   

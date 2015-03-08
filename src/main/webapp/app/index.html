@@ -25,15 +25,15 @@
 		<div class="navbar navbar-inverse" ng-controller="HeaderCtrl">
 			<ul class="nav navbar-nav">
 				<li
-					ng-class="{ active: isActive('/places') || isActive('/places/add')}"><a
+					ng-class="{ active: isActive('/places')}"><a
 					href="/app/#/places">Places</a></li>
 				<li
-					ng-class="{ active: isActive('/features') || isActive('/features/add')}"><a
+					ng-class="{ active: isActive('/features')}"><a
 					href="/app/#/features">Features</a></li>
 
 			</ul>
 			<button type="button" class="btn btn-primary pull-right btn-lg"
-				ng-click="add()">Create</button>
+				ng-click="add()" ng-show="isActive('/places') || isActive('/features')">Create</button>
 		</div>
 
 		<div ng-view></div>
