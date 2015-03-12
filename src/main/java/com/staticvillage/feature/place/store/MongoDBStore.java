@@ -38,6 +38,8 @@ public class MongoDBStore implements DataStore<TransactionObject> {
     public static final String KEY_COUNTRY = "country";
     public static final String KEY_NAME = "name";
     public static final String KEY_CATEGORY = "category";
+    public static final String KEY_LAT = "latitude";
+    public static final String KEY_LNG = "longitude";
     public static final String KEY_TYPE = "type";
 
     /**
@@ -101,7 +103,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
             e.printStackTrace();
         }
 
-        return new TransactionObject[0];
+        return null;
     }
 
     /**
@@ -272,28 +274,35 @@ public class MongoDBStore implements DataStore<TransactionObject> {
     protected DBObject getQuery(HashMap<String, Object> map){
         BasicDBObject dbObject = new BasicDBObject();
 
-        if(map.containsKey(PlaceController.EXTRA_KEY_ID) &&
+        if(map.containsKey(PlaceController.EXTRA_KEY_ID) && (String) map.get(PlaceController.EXTRA_KEY_ID) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_ID)).isEmpty())
             dbObject.put("_id", new ObjectId((String) map.get(PlaceController.EXTRA_KEY_ID)));
         if(map.containsKey(PlaceController.EXTRA_KEY_COUNTRY) &&
+                (String) map.get(PlaceController.EXTRA_KEY_COUNTRY) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_COUNTRY)).isEmpty())
             dbObject.put(KEY_COUNTRY, (String) map.get(PlaceController.EXTRA_KEY_COUNTRY));
         if(map.containsKey(PlaceController.EXTRA_KEY_STATE) &&
+                (String) map.get(PlaceController.EXTRA_KEY_STATE) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_STATE)).isEmpty())
             dbObject.put(KEY_STATE, (String) map.get(PlaceController.EXTRA_KEY_STATE));
         if(map.containsKey(PlaceController.EXTRA_KEY_CITY) &&
+                (String) map.get(PlaceController.EXTRA_KEY_CITY) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_CITY)).isEmpty())
             dbObject.put(KEY_CITY, (String) map.get(PlaceController.EXTRA_KEY_CITY));
         if(map.containsKey(PlaceController.EXTRA_KEY_NEIGHBORHOOD) &&
+                (String) map.get(PlaceController.EXTRA_KEY_NEIGHBORHOOD) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_NEIGHBORHOOD)).isEmpty())
             dbObject.put(KEY_NEIGHBORHOOD, (String) map.get(PlaceController.EXTRA_KEY_NEIGHBORHOOD));
         if(map.containsKey(PlaceController.EXTRA_KEY_NAME) &&
+                (String) map.get(PlaceController.EXTRA_KEY_NAME) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_NAME)).isEmpty())
             dbObject.put(KEY_NAME, (String) map.get(PlaceController.EXTRA_KEY_NAME));
         if(map.containsKey(PlaceController.EXTRA_KEY_CATEGORY) &&
+                (String) map.get(PlaceController.EXTRA_KEY_CATEGORY) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_CATEGORY)).isEmpty())
             dbObject.put(KEY_CATEGORY, (String) map.get(PlaceController.EXTRA_KEY_CATEGORY));
         if(map.containsKey(PlaceController.EXTRA_KEY_TYPE) &&
+                (String) map.get(PlaceController.EXTRA_KEY_TYPE) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_TYPE)).isEmpty())
             dbObject.put(KEY_TYPE, (String) map.get(PlaceController.EXTRA_KEY_TYPE));
 

@@ -14,6 +14,8 @@ public class Place implements TransactionObject {
     private String country;
     private String name;
     private String location;
+    private double latitude;
+    private double longitude;
     private String type;
     private Feature[] features;
 
@@ -41,9 +43,9 @@ public class Place implements TransactionObject {
         return name;
     }
 
-    public String getLocation() {
-        return location;
-    }
+    public double getLatitude() { return latitude; }
+
+    public double getLongitude() { return longitude; }
 
     public String getType() { return type; }
 

@@ -24,6 +24,8 @@ public class PlaceController {
     public static final String EXTRA_KEY_STATE = "state";
     public static final String EXTRA_KEY_COUNTRY = "country";
     public static final String EXTRA_KEY_TYPE = "type";
+    public static final String EXTRA_KEY_LAT = "latitude";
+    public static final String EXTRA_KEY_LNG = "longitude";
     public static final String EXTRA_KEY_CATEGORY = "category";
 
     public static final String AUTO_TYPE_PLACE = "place";
@@ -53,12 +55,14 @@ public class PlaceController {
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
         map.put(EXTRA_KEY_ID, place.getId());
-        map.put(EXTRA_KEY_NAME, place.getName());
-        map.put(EXTRA_KEY_COUNTRY, place.getId());
-        map.put(EXTRA_KEY_STATE, place.getId());
-        map.put(EXTRA_KEY_CITY, place.getId());
-        map.put(EXTRA_KEY_NEIGHBORHOOD, place.getId());
-        map.put(EXTRA_KEY_TYPE, place.getType());
+        map.put(EXTRA_KEY_NAME, place.getName().toLowerCase());
+        map.put(EXTRA_KEY_COUNTRY, place.getCountry().toLowerCase());
+        map.put(EXTRA_KEY_STATE, place.getState().toLowerCase());
+        map.put(EXTRA_KEY_CITY, place.getCity().toLowerCase());
+        map.put(EXTRA_KEY_NEIGHBORHOOD, place.getNeighborhood().toLowerCase());
+        map.put(EXTRA_KEY_LAT, place.getLatitude());
+        map.put(EXTRA_KEY_LNG, place.getLongitude());
+        map.put(EXTRA_KEY_TYPE, place.getType().toLowerCase());
 
         TransactionObject[] places = store.retrieve(map);
 
@@ -106,17 +110,24 @@ public class PlaceController {
                                   @RequestParam(value = "city", defaultValue = "")String city,
                                   @RequestParam(value = "neighborhood", defaultValue = "")String neighborhood,
                                   @RequestParam(value = "type", defaultValue = "")String type,
+                                  @RequestParam(value = "lat", defaultValue = "NaN") String latitude,
+                                  @RequestParam(value = "lng", defaultValue = "NaN") String longitude,
                                   @RequestParam(value = "name", defaultValue = "")String name){
         log.info(String.format("Checking if Place already exists [%s,%s,%s,%s,%s]...", name, country, state, city,
                 neighborhood));
+
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
-        map.put(EXTRA_KEY_NAME, name);
-        map.put(EXTRA_KEY_NEIGHBORHOOD, neighborhood);
-        map.put(EXTRA_KEY_CITY, city);
-        map.put(EXTRA_KEY_STATE, state);
-        map.put(EXTRA_KEY_COUNTRY, country);
-        map.put(EXTRA_KEY_TYPE, type);
+        map.put(EXTRA_KEY_NAME, name.toLowerCase());
+        map.put(EXTRA_KEY_NEIGHBORHOOD, neighborhood.toLowerCase());
+        map.put(EXTRA_KEY_CITY, city.toLowerCase());
+        map.put(EXTRA_KEY_STATE, state.toLowerCase());
+        map.put(EXTRA_KEY_COUNTRY, country.toLowerCase());
+        if(!latitude.equals("Nan"))
+            map.put(EXTRA_KEY_LAT, Double.parseDouble(latitude));
+        if(!longitude.equals("Nan"))
+            map.put(EXTRA_KEY_LNG, Double.parseDouble(longitude));
+        map.put(EXTRA_KEY_TYPE, type.toLowerCase());
 
         TransactionObject[] places = store.retrieve(map);
 
@@ -169,12 +180,14 @@ public class PlaceController {
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
         map.put(EXTRA_KEY_ID, id);
-        map.put(EXTRA_KEY_NAME, place.getName());
-        map.put(EXTRA_KEY_COUNTRY, place.getId());
-        map.put(EXTRA_KEY_STATE, place.getId());
-        map.put(EXTRA_KEY_CITY, place.getId());
-        map.put(EXTRA_KEY_NEIGHBORHOOD, place.getId());
-        map.put(EXTRA_KEY_TYPE, place.getType());
+        map.put(EXTRA_KEY_NAME, place.getName().toLowerCase());
+        map.put(EXTRA_KEY_COUNTRY, place.getCountry().toLowerCase());
+        map.put(EXTRA_KEY_STATE, place.getState().toLowerCase());
+        map.put(EXTRA_KEY_CITY, place.getCity().toLowerCase());
+        map.put(EXTRA_KEY_NEIGHBORHOOD, place.getNeighborhood().toLowerCase());
+        map.put(EXTRA_KEY_LAT, place.getLatitude());
+        map.put(EXTRA_KEY_LNG, place.getLongitude());
+        map.put(EXTRA_KEY_TYPE, place.getType().toLowerCase());
 
         TransactionObject[] places = store.retrieve(map);
 
@@ -202,7 +215,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/name", method = RequestMethod.GET)
     public Response autoCompletePlaceName(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_PLACE, "name", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "name", query.toLowerCase());
     }
 
     /**
@@ -213,7 +226,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/neighborhood", method = RequestMethod.GET)
     public Response autoCompletePlaceNeighborhood(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_PLACE, "neighborhood", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "neighborhood", query.toLowerCase());
     }
 
     /**
@@ -224,7 +237,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/city", method = RequestMethod.GET)
     public Response autoCompletePlaceCity(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_PLACE, "city", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "city", query.toLowerCase());
     }
 
     /**
@@ -235,7 +248,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/state", method = RequestMethod.GET)
     public Response autoCompletePlaceState(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_PLACE, "state", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "state", query.toLowerCase());
     }
 
     /**
@@ -246,7 +259,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/place/country", method = RequestMethod.GET)
     public Response autoCompletePlaceCountry(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_PLACE, "country", query);
+        return autoComplete(store, AUTO_TYPE_PLACE, "country", query.toLowerCase());
     }
 
     /**
@@ -261,8 +274,8 @@ public class PlaceController {
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Feature.class);
-        map.put(EXTRA_KEY_NAME, feature.getName());
-        map.put(EXTRA_KEY_CATEGORY, feature.getCategory());
+        map.put(EXTRA_KEY_NAME, feature.getName().toLowerCase());
+        map.put(EXTRA_KEY_CATEGORY, feature.getCategory().toLowerCase());
 
         TransactionObject[] features = store.retrieve(map);
 
@@ -294,8 +307,8 @@ public class PlaceController {
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Feature.class);
-        map.put(EXTRA_KEY_NAME, name);
-        map.put(EXTRA_KEY_CATEGORY, category);
+        map.put(EXTRA_KEY_NAME, name.toLowerCase());
+        map.put(EXTRA_KEY_CATEGORY, category.toLowerCase());
 
         TransactionObject[] features = store.retrieve(map);
 
@@ -341,7 +354,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/feature/name", method = RequestMethod.GET)
     public Response autoCompleteFeatureName(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_FEATURE, "name", query);
+        return autoComplete(store, AUTO_TYPE_FEATURE, "name", query.toLowerCase());
     }
 
     /**
@@ -352,7 +365,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/autocomplete/feature/category", method = RequestMethod.GET)
     public Response autoCompleteFeatureCategory(@RequestParam(value = "q", defaultValue = "") String query){
-        return autoComplete(store, AUTO_TYPE_FEATURE, "category", query);
+        return autoComplete(store, AUTO_TYPE_FEATURE, "category", query.toLowerCase());
     }
 
     /**
