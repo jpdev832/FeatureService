@@ -93,13 +93,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
 
             if(cursor.count() > 0)
                 return objects;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -111,12 +105,12 @@ public class MongoDBStore implements DataStore<TransactionObject> {
      *
      * @param object object to store
      * @param extras any additional data need for data store
-     * @return status
+     * @return id
      */
     @Override
-    public boolean insert(TransactionObject object, HashMap<String, Object> extras) {
+    public String insert(TransactionObject object, HashMap<String, Object> extras) {
         if(!extras.containsKey(PlaceController.EXTRA_KEY_TARGET))
-            return false;
+            return null;
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -126,7 +120,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
             else if(extras.get(PlaceController.EXTRA_KEY_TARGET) == Feature.class)
                 strCollection = COLLECTION_FEATURE;
             else
-                return false;
+                return null;
 
             DBCollection collection = getCollection(strCollection);
 
@@ -138,7 +132,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
 
             WriteResult writeResult = collection.insert(dbObj, WriteConcern.NORMAL);
             System.out.println(String.format("Affected rows: %d", writeResult.getN()));
-            return true;
+            return ((ObjectId)dbObj.get("_id")).toString();
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println(String.format("Error occurred: %s", e.getMessage()));
@@ -146,7 +140,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
             e.printStackTrace();
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -154,11 +148,11 @@ public class MongoDBStore implements DataStore<TransactionObject> {
      *
      * @param objects objects to store
      * @param extras any additional data need for data store
-     * @return status
+     * @return id
      */
     @Override
-    public boolean insertAll(TransactionObject[] objects, HashMap<String, Object> extras) {
-        return false;
+    public String[] insertAll(TransactionObject[] objects, HashMap<String, Object> extras) {
+        return null;
     }
 
     /**
@@ -166,7 +160,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
      *
      * @param object object to update
      * @param extras any additional data need for data store
-     * @return status
+     * @return id
      */
     @Override
     public boolean update(TransactionObject object, HashMap<String, Object> extras) {
@@ -201,6 +195,40 @@ public class MongoDBStore implements DataStore<TransactionObject> {
             e.printStackTrace();
         }
 
+        return false;
+    }
+
+    @Override
+    public boolean delete(String id, HashMap<String, Object> extras) {
+        if(!extras.containsKey(PlaceController.EXTRA_KEY_TARGET) || !extras.containsKey(PlaceController.EXTRA_KEY_ID))
+            return false;
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String strCollection;
+            if(extras.get(PlaceController.EXTRA_KEY_TARGET) == Place.class)
+                strCollection = COLLECTION_PLACE;
+            else if(extras.get(PlaceController.EXTRA_KEY_TARGET) == Feature.class)
+                strCollection = COLLECTION_FEATURE;
+            else
+                return false;
+
+            DBCollection collection = getCollection(strCollection);
+
+            DBObject query = new BasicDBObject("_id", new ObjectId(id));
+            WriteResult writeResult = collection.remove(query);
+
+            log.info(String.format("Deleted %s", id));
+            return true;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean deleteAll(HashMap<String, Object> extras) {
         return false;
     }
 
@@ -274,7 +302,7 @@ public class MongoDBStore implements DataStore<TransactionObject> {
     protected DBObject getQuery(HashMap<String, Object> map){
         BasicDBObject dbObject = new BasicDBObject();
 
-        if(map.containsKey(PlaceController.EXTRA_KEY_ID) && (String) map.get(PlaceController.EXTRA_KEY_ID) != null &&
+        if (map.containsKey(PlaceController.EXTRA_KEY_ID) && (String) map.get(PlaceController.EXTRA_KEY_ID) != null &&
                 !((String) map.get(PlaceController.EXTRA_KEY_ID)).isEmpty())
             dbObject.put("_id", new ObjectId((String) map.get(PlaceController.EXTRA_KEY_ID)));
         if(map.containsKey(PlaceController.EXTRA_KEY_COUNTRY) &&
@@ -323,6 +351,4 @@ public class MongoDBStore implements DataStore<TransactionObject> {
         BasicDBObject inObj = new BasicDBObject("$in", lst);
         return new BasicDBObject(key, inObj);
     }
-
-
 }

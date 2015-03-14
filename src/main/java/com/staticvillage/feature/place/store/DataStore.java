@@ -19,27 +19,43 @@ public interface DataStore<T> {
      *
      * @param object object to store
      * @param extras any additional data need for data store
-     * @return insert status
+     * @return id
      */
-    public boolean insert(T object, HashMap<String, Object> extras);
+    public String insert(T object, HashMap<String, Object> extras);
 
     /**
      * Insert N data elements into the data store
      *
      * @param objects objects to store
      * @param extras any additional data need for data store
-     * @return insert status
+     * @return id
      */
-    public boolean insertAll(T[] objects, HashMap<String, Object> extras);
+    public String[] insertAll(T[] objects, HashMap<String, Object> extras);
 
     /**
      * Update data in the data store
      *
      * @param object object to update
      * @param extras any additional data need for data store
-     * @return update status
+     * @return status
      */
     public boolean update(T object, HashMap<String, Object> extras);
+
+    /**
+     * Delete data from the data store
+     *
+     * @param id data id
+     * @return status
+     */
+    public boolean delete(String id, HashMap<String, Object> extras);
+
+    /**
+     * Delete all entries
+     *
+     * @param extras
+     * @return status
+     */
+    public boolean deleteAll(HashMap<String, Object> extras);
 
     /**
      * Retrieve autocomplete results

@@ -49,8 +49,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place", method = { RequestMethod.PUT, RequestMethod.POST })
     public Response setPlace(@RequestBody Place place){
-        log.info(String.format("Checking if Place already exists [%s,%s,%s,%s,%s]...", place.getName(),
-                place.getCountry(), place.getState(), place.getCity(), place.getNeighborhood()));
+        log.info(String.format("Checking if Place already exists %s...", place.toString()));
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
@@ -72,7 +71,7 @@ public class PlaceController {
                 return new Response(null, "Failed to update. {Invalid Place ID}", false, "places", "place" );
             }
 
-            log.info(String.format("Updating {%s}", place.getName()));
+            log.info(String.format("Updating %s", place.toString()));
 
             if(store.update(place, map)) {
                 log.info(String.format("Updated!: %s", place.getId()));
@@ -82,10 +81,12 @@ public class PlaceController {
                 return new Response(null, "failed", false, "places", "place");
             }
         } else {
-            log.info(String.format("Adding {%s}", place.getName()));
+            log.info(String.format("Adding %s", place.toString()));
 
-            if (store.insert(place, map)) {
-                log.info(String.format("Added!: %s", place.getId()));
+            String id = store.insert(place, map);
+            if (id != null) {
+                place.setId(id);
+                log.info(String.format("Added!: %s", place.toString()));
                 return new Response(new Place[]{place}, "success", true, "places", "place");
             } else {
                 log.info(String.format("Failed to Add: %s", place.getName()));
@@ -113,8 +114,8 @@ public class PlaceController {
                                   @RequestParam(value = "lat", defaultValue = "NaN") String latitude,
                                   @RequestParam(value = "lng", defaultValue = "NaN") String longitude,
                                   @RequestParam(value = "name", defaultValue = "")String name){
-        log.info(String.format("Checking if Place already exists [%s,%s,%s,%s,%s]...", name, country, state, city,
-                neighborhood));
+        log.info(String.format("Finding.. [name:%s,country:%s,state:%s,city:%s,neighborhood%s,type:%s,lat:%s,lng:%s]...",
+                name, country, state, city,neighborhood, type, latitude, longitude));
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
@@ -147,7 +148,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place/{id}", method = RequestMethod.GET)
     public Response getPlace(@PathVariable("id") String id){
-        log.info(String.format("Checking if Place already exists [%s]...", id));
+        log.info(String.format("Finding Place with Id=%s...", id));
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
@@ -174,8 +175,7 @@ public class PlaceController {
     public Response setPlace(@PathVariable("id") String id,
                                   @RequestBody Place place){
 
-        log.info(String.format("Checking if Place exists [%s,%s,%s,%s,%s,%s]...", id, place.getName(),
-                place.getCountry(), place.getState(), place.getCity(), place.getNeighborhood()));
+        log.info(String.format("Updating %s, %s...", id, place.toString()));
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Place.class);
@@ -203,7 +203,7 @@ public class PlaceController {
             }
         }
 
-        log.info(String.format("Failed to Update: %s", place.getName()));
+        log.info(String.format("Failed to Update: %s", place.toString()));
         return new Response(null, "failed", false, "places", "place");
     }
 
@@ -270,7 +270,7 @@ public class PlaceController {
      */
     @RequestMapping(value = "/place/feature", method = { RequestMethod.PUT, RequestMethod.POST })
     public Response setFeature(@RequestBody Feature feature){
-        log.info(String.format("Checking if Feature exists [%s,%s]...", feature.getName(), feature.getCategory()));
+        log.info(String.format("Checking if Feature exists %s...", feature.toString()));
 
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put(EXTRA_KEY_TARGET, Feature.class);
@@ -280,16 +280,18 @@ public class PlaceController {
         TransactionObject[] features = store.retrieve(map);
 
         if(features != null) {
-            log.info(String.format("Feature already exists: {%s}", feature.getName()));
-            return new Response(null, "already exists", false, "places", "feature");
+            log.info(String.format("Feature already exists: {%s}", feature.toString()));
+            return new Response(null, "already exists", false, "features", "feature");
         }
 
-        if(store.insert(feature, map)) {
-            log.info(String.format("Feature was added: {%s}", feature.getId()));
-            return new Response(new Feature[]{feature}, "success", true, "places", "feature");
+        String id = store.insert(feature, map);
+        if(id != null) {
+            feature.setId(id);
+            log.info(String.format("Feature was added: %s", feature.toString()));
+            return new Response(new Feature[]{feature}, "success", true, "features", "feature");
         }else {
-            log.info(String.format("Failed to add feature: {%s}", feature.getName()));
-            return new Response(null, "failed", false, "places", "feature");
+            log.info(String.format("Failed to add feature: %s", feature.toString()));
+            return new Response(null, "failed", false, "features", "feature");
         }
     }
 
@@ -317,7 +319,7 @@ public class PlaceController {
             return new Response(null, "Error occurred retrieving features", false, "places", "feature");
         } else {
             log.info(String.format("Found %d features", features.length));
-            return new Response(features, "success", true, "places", "feature");
+            return new Response(features, "success", true, "features", "feature");
         }
     }
 
@@ -339,10 +341,10 @@ public class PlaceController {
 
         if(features == null) {
             log.warn("no features were found!");
-            return new Response(null, "Error occurred retrieving feature", false, "places", "feature");
+            return new Response(null, "Error occurred retrieving feature", false, "features", "feature");
         } else {
             log.info(String.format("Found %d features", features.length));
-            return new Response(features, "success", true, "places", "feature");
+            return new Response(features, "success", true, "features", "feature");
         }
     }
 
