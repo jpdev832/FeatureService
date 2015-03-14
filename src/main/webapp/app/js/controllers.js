@@ -5,16 +5,16 @@
 //TODO move each controller to its own file
 var controllers = angular.module('controllers', []);
 
-controllers.controller('UpdateCtrl', [ '$scope','$location', '$routeParams', 'Place', 'Feature', function($scope, $location, $routeParams, Place, Feature) {
+controllers.controller('SubmitCtrl', [ '$scope','$location', '$routeParams', 'Place', 'Feature', function($scope, $location, $routeParams, Place, Feature) {
 	
-	if($location.path() == '/places/update/'+$routeParams.id){
+	if($location.path() == '/places/view/'+$routeParams.id){
 
-		$scope.resource = "place";
+		$scope.resource = "Place";
 		Place.get({id: $routeParams.id}, function(resource){
 			$scope.data = resource.data[0];
 		});
 		
-	}else if ($location.path() == '/features/update/'+$routeParams.id){
+	}else if ($location.path() == '/features/view/'+$routeParams.id){
 		$scope.resource = "Feature";
 		Feature.get({id: $routeParams.id}, function(resource){
 			$scope.data = resource.data[0];
@@ -22,60 +22,57 @@ controllers.controller('UpdateCtrl', [ '$scope','$location', '$routeParams', 'Pl
 	}
 	
 	$scope.save = function() {
+		
+		if($scope.data.features.length > 0){
+			
+			for(var i=0; i<$scope.data.features.length; i++){	
+				var feature = Feature.get({name: $scope.data.features[i].name, category: $scope.data.features[i].category }, function(){});
+				if(angular.equals({}, feature)){
+					var feature = new Feature($scope.data.features[i])
+					feature.$save();
+				}
+			}
+		}
+		
 		if($scope.resource == "Place"){
 			var place = new Place($scope.data);
 			place.$save({},
 				function(success){
-				   $scope.updateSuccess = true;
+				   $scope.addSuccess = true;
 				},
 				function(error){
-					 $scope.updateError = true;
+					 $scope.addError = true;
 				});
 		}else if ($scope.resource == "Feature"){
 			var feature = new Feature($scope.data);
 			feature.$save({},
 					function(success){
-				   $scope.updateSuccess = true;
+				   $scope.addSuccess = true;
 				},
 				function(error){
-					 $scope.updateError = true;
+					 $scope.addError = true;
 				});
 		}
 	};
-}
-
-]);
-
-controllers.controller('AddCtrl', [ '$scope','$location', 'Place', 'Feature', function($scope, $location, Place, Feature) {
-
-	if($location.path() == "/places/add"){
-		$scope.resource = "Place";
-	}else if ($location.path() == "/features/add"){
-		$scope.resource = "Feature";
+	
+	$scope.addFeature = function(){
+		
+		if($scope.data && $scope.data.features){
+			$scope.data.features.push({});
+		}else{
+			$scope.data = {};
+			$scope.data.features = [];
+			$scope.data.features.push({});
+		}
+		
 	}
 	
-	$scope.save = function() {
-		if($scope.resource == "Place"){
-			var place = new Place($scope.data)
-			place.$save({},
-				function(success){
-				   $scope.addSuccess = true;
-				},
-				function(error){
-					 $scope.addError = true;
-				});
-		}else if ($scope.resource == "Feature"){
-			var feature = new Feature($scope.data)
-			feature.$save({},
-				function(success){
-				   $scope.addSuccess = true;
-				},
-				function(error){
-					 $scope.addError = true;
-				});
-		}
-	};
-
+	$scope.deleteFeature = function(index){
+		
+		$scope.data.features.splice(index,1)
+		
+	}
+	
 }
 
 ]);
@@ -105,6 +102,11 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 		}
 	};
 	
+    
+	$scope.add = function(){
+		$location.path($location.path()+"/add")		
+	}
+	
 	function getResources(filter){
 		
 		if(resource == "places"){
@@ -119,13 +121,13 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 		}
 	}
 	
-	$scope.update = function(id){
+	$scope.view = function(id){
 		$scope.idSelectedItem = id;
-		$location.path($location.path()+"/update/"+id)
+		$location.path($location.path()+"/view/"+id)
 		
 	}
 	
-	//TODO move static fields to files
+	//TODO get from API
 	function loadPlaceFields(){
 		$scope.fields = [{key:"name", val:'Name'}, {key:"location", val:'Location'}, {key:"neighborhood", val:'Neighborhood'}, {key:"type", val:'Type'}, {key:"city", val:'City'}, {key:"state", val:'State'}, {key:"country", val:'Country'}]
 	}
@@ -145,11 +147,6 @@ controllers.controller('HeaderCtrl', [ '$scope', '$location', function($scope, $
     	$scope.location = viewLocation;
         return viewLocation === $location.path();
     };
-    
-	$scope.add = function(){
-		$location.path($location.path()+"/add")		
-	}
-    
   
 }]);
 

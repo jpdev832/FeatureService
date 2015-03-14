@@ -13,6 +13,7 @@
 <script src="bower_components/angular-route/angular-route.js"></script>
 <script src="bower_components/angular-resource/angular-resource.js"></script>
 <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+<script src="bower_components/angu-fixed-header-table/angu-fixed-header-table.js"></script>
 
 <script src="js/app.js"></script>
 <script src="js/controllers.js"></script>
@@ -20,24 +21,48 @@
 
 </head>
 <body>
-	<div class="container-fluid">
+	<!-- <div class="span12">
 
-		<div class="navbar navbar-inverse" ng-controller="HeaderCtrl">
+		<div class="navbar navbar-inverse container-fluid"
+			ng-controller="HeaderCtrl">
 			<ul class="nav navbar-nav">
-				<li
-					ng-class="{ active: isActive('/places')}"><a
-					href="/app/#/places">Places</a></li>
-				<li
-					ng-class="{ active: isActive('/features')}"><a
-					href="/app/#/features">Features</a></li>
+				<li ng-class="{ active: isActive('/places')}"><a
+					href="/app/#/places"><h4>Places</h2></a></li>
+				<li ng-class="{ active: isActive('/features')}"><a
+					href="/app/#/features"><h4>Features</h4></a></li>
 
 			</ul>
+
 			<button type="button" class="btn btn-primary pull-right btn-lg"
-				ng-click="add()" ng-show="isActive('/places') || isActive('/features')">Create</button>
+				aria-label="Left Align" ng-click="add()"
+				ng-show="isActive('/places') || isActive('/features')">
+				<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+			</button>
 		</div>
+	</div>  -->
 
-		<div ng-view></div>
+	<nav role="navigation" class="navbar navbar-inverse">
+		<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+			<button type="button" data-target="#navbarCollapse"
+				data-toggle="collapse" class="navbar-toggle">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a href="/app/#/places" class="navbar-brand">Recommendus</a>
+		</div>
+		<!-- Collection of nav links, forms, and other content for toggling -->
+		<div id="navbarCollapse" class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li ng-class="{ active: isActive('/places')}"><a
+					href="/app/#/places">Places</a></li>
+				<li ng-class="{ active: isActive('/features')}"><a
+					href="/app/#/features">Features</a></li>
+			</ul>
+		</div>
+	</nav>
 
-	</div>
+	<div ng-view></div>
 </body>
 </html>

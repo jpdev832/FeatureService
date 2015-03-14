@@ -1,10 +1,10 @@
 <div class="container-fluid">
 
 	<form class="form-horizontal" ng-submit="search()">
-	
+
 		<div class="row">
 
-			<div class="form-group col-xs-2">
+			<div class="col-xs-3">
 
 				<select ng-model="searchField" class="form-control input-lg">
 					<option value="" selected disabled>Search by</option>
@@ -14,62 +14,101 @@
 				</select>
 
 			</div>
-			<div class="form-group col-xs-8">
+			<div class="col-xs-6">
 				<input type="text" class="form-control input-lg"
 					ng-model="searchText">
 			</div>
-			<div class="form-group col-xs-2">
-				<button type="submit" class="btn btn-default btn-lg">Search</button>
+			<div class="col-xs-3">
+				<button type="button" class="btn btn-default btn-lg"
+					aria-label="Left Align" type="submit">
+					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+					Search
+				</button>
 			</div>
+
+
+
+		</div>
+	</form>
+
+	<div class="row" ng-show="places">
+		<div class="form-group col-xs-12">
+			<table class="table table-striped" fixed-header table-height="650px">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Neighborhood</th>
+						<th>City</th>
+						<th>State</th>
+						<th>Country</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in places | orderBy:'name'"
+						ng-click="view(item.id)"
+						ng-class="{selected: item.id === idSelectedItem}">
+						<td>{{item.name}}</td>
+						<td>{{item.type}}</td>
+						<td>{{item.neighborhood}}</td>
+						<td>{{item.city}}</td>
+						<td>{{item.state}}</td>
+						<td>{{item.country}}</td>
+					</tr>
+
+				</tbody>
+				<tfoot>
+					<tr>
+						<td>
+							<button type="button"
+								class="btn btn-primary col-xs-offset-1  btn-lg"
+								style="width: 530px;" aria-label="Left Align" ng-click="add()">
+								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add Place
+							</button>
+						</td>
+
+					</tr>
+				</tfoot>
+			</table>
 
 		</div>
 
-		<div class="row" ng-show="places">
-			<div class="form-group col-xs-12">
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th>Type</th>
-							<th>Neighborhood</th>
-							<th>City</th>
-							<th>State</th>
-							<th>Country</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr ng-repeat="item in places | orderBy:'name'" ng-click="update(item.id)" ng-class="{selected: item.id === idSelectedItem}">
-							<td>{{item.name}}</td>
-							<td>{{item.type}}</td>
-							<td>{{item.neighborhood}}</td>
-							<td>{{item.city}}</td>
-							<td>{{item.state}}</td>
-							<td>{{item.country}}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
+	</div>
 
-		<div class="row" ng-show="features">
-			<div class="form-group col-xs-12">
-				<table class="table table-striped">
-					<thead>
+	<div class="row" ng-show="features">
+		<div class="form-group col-xs-12">
+			<table class="table table-striped" fixed-header table-height="650px">
+				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Category</th>
+						<th>Value</th>						
 					</tr>
-					</thead>
-					<tbody>
-					<tr ng-repeat="item in features | orderBy:'name'" ng-click="update(item.id)" ng-class="{selected: item.id === idSelectedItem}">
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in features | orderBy:'name'"
+						ng-click="view(item.id)"
+						ng-class="{selected: item.id === idSelectedItem}">
 						<td>{{item.name}}</td>
 						<td>{{item.category}}</td>
+						<td>{{item.value}}</td>
 					</tr>
-					</tbody>
-				</table>
-			</div>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td>
+							<button type="button"
+								class="btn btn-primary col-xs-offset-1  btn-lg"
+								style="width: 530px;" aria-label="Left Align" ng-click="add()">
+								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add Feature
+							</button>
+						</td>
+
+					</tr>
+				</tfoot>
+			</table>
 		</div>
-	
-	</form>
+	</div>
+
 
 </div>

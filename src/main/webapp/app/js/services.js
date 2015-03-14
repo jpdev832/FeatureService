@@ -5,6 +5,7 @@
 var services = angular.module('services', ['ngResource']);
 
 var basePath = 'http://jpdev832.dyndns.org:8089'
+	
 services.factory('Place', ['$resource',
   function($resource){
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var recommendation = angular.module('recommendation', ['ngRoute', 'controllers','services']);
+var recommendation = angular.module('recommendation', ['ngRoute', 'controllers','services','anguFixedHeaderTable']);
 
 recommendation.config(['$routeProvider', 
    function($routeProvider){
@@ -15,20 +15,20 @@ recommendation.config(['$routeProvider',
 			controller: 'SearchCtrl'
 		}).
 		when('/places/add', {
-			templateUrl: 'partials/add.html',
-			controller: 'AddCtrl'
+			templateUrl: 'partials/places/submit.html',
+			controller: 'SubmitCtrl'
 		}).
 		when('/features/add', {
-			templateUrl: 'partials/add.html',
-			controller: 'AddCtrl'
+			templateUrl: 'partials/features/submit.html',
+			controller: 'SubmitCtrl'
 		}).
-		when('/places/update/:id', {
-			templateUrl: 'partials/update.html',
-			controller: 'UpdateCtrl'
+		when('/places/view/:id', {
+			templateUrl: 'partials/places/submit.html',
+			controller: 'SubmitCtrl'
 		}).
-		when('/features/update/:id', {
-			templateUrl: 'partials/update.html',
-			controller: 'UpdateCtrl'
+		when('/features/view/:id', {
+			templateUrl: 'partials/features/submit.html',
+			controller: 'SubmitCtrl'
 		}).
 		otherwise({
 	        redirectTo: '/places'
