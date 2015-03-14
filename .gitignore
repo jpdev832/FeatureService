@@ -1,9 +1,0 @@
-/target/
-logs/*
-!.gitkeep
-node_modules/
-tmp
-.DS_Store
-bower_components/
-/.classpath
-/.project
