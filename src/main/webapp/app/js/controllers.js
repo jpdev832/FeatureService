@@ -5,7 +5,8 @@
 //TODO move each controller to its own file
 var controllers = angular.module('controllers', []);
 
-controllers.controller('SubmitCtrl', [ '$scope','$location', '$routeParams', 'Place', 'Feature', function($scope, $location, $routeParams, Place, Feature) {
+controllers.controller('SubmitCtrl', [ '$scope','$location', '$routeParams', 'Place', 'Feature',
+	function($scope, $location, $routeParams, Place, Feature ) {
 	
 	if($location.path() == '/places/view/'+$routeParams.id){
 
@@ -77,11 +78,13 @@ controllers.controller('SubmitCtrl', [ '$scope','$location', '$routeParams', 'Pl
 
 ]);
 
-controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature', function($scope, $location, Place, Feature) {	
+controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature', 'AutoCompletePlace',
+	'AutoCompleteFeature', function($scope, $location, Place, Feature, AutoCompletePlace, AutoCompleteFeature) {
 
 	var resource;
-	
 	$scope.defaultField = "Search By";
+	$scope.searchText = "";
+
 	if($location.path() == "/places"){
 		resource = "places";
 		loadPlaceFields();
@@ -101,7 +104,42 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 			
 		}
 	};
-	
+
+	/**
+	* AutoComplete requests
+	*/
+	$scope.autoComplete = function(autoText){
+		console.log("auto text: "+autoText);
+		if ($scope.searchField) {
+			var filter = { property:$scope.searchField, q:autoText };
+
+			if(resource == "places"){
+				AutoCompletePlace.get(filter, function(response){
+					if(response.data == null)
+						$scope.suggestions = [];
+					else
+						$scope.suggestions = response.data.sort();
+				});
+			}else if (resource == "features"){
+				AutoCompleteFeature.get(filter, function(response){
+					if(response.data == null)
+						$scope.suggestions = [];
+					else
+						$scope.suggestions = response.data.sort();
+				});
+			}
+		}
+	};
+
+	/**
+	* Set auto search text to completed text
+	**/
+	$scope.autoCompleteSelected = function(autoText) {
+		$scope.searchText = autoText;
+		$scope.suggestions = [];
+	};
+
+	$scope.orderByProxy = function(x) { return x; }
     
 	$scope.add = function(){
 		$location.path($location.path()+"/add")		
@@ -113,7 +151,7 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 			Place.get(filter, function(response){
 				$scope.places = response.data;
 			});
-			
+
 		}else if (resource == "features"){
 			Feature.get(filter, function(response){
 				$scope.features = response.data;

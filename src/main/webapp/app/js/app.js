@@ -1,6 +1,6 @@
 'use strict';
 
-var recommendation = angular.module('recommendation', ['ngRoute', 'controllers','services','anguFixedHeaderTable']);
+var recommendation = angular.module('recommendation', ['ngRoute', 'controllers','services','directives','anguFixedHeaderTable']);
 
 recommendation.config(['$routeProvider', 
    function($routeProvider){

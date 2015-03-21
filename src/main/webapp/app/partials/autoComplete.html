@@ -1,0 +1,8 @@
+<div class="col-xs-6" style="position:relative">
+    <input type="text" class="form-control input-lg" ng-model="searchText" ng-keyup="autoComplete(searchText)">
+
+    <div class="list-group col-xs-12" style="position:absolute;z-index:9999">
+        <a href="" class="list-group-item col-xs-12"
+           ng-repeat="suggestion in suggestions" ng-click="autoCompleteSelected(suggestion)">{{suggestion}}</a>
+    </div>
+</div>
