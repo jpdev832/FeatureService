@@ -95,9 +95,7 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 	getResources({})
 
 	$scope.search = function() {
-
 		if ($scope.searchField) {
-			
 			var filter = {};
 			filter[$scope.searchField] = $scope.searchText;
 			getResources(filter)
@@ -109,7 +107,6 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 	* AutoComplete requests
 	*/
 	$scope.autoComplete = function(autoText){
-		console.log("auto text: "+autoText);
 		if ($scope.searchField) {
 			var filter = { property:$scope.searchField, q:autoText };
 
@@ -146,7 +143,7 @@ controllers.controller('SearchCtrl', [ '$scope', '$location', 'Place', 'Feature'
 	}
 	
 	function getResources(filter){
-		
+		console.log(filter);
 		if(resource == "places"){
 			Place.get(filter, function(response){
 				$scope.places = response.data;
